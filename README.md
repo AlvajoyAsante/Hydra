@@ -26,7 +26,7 @@ You can join the Oxygen Programming Discord Server for help or read the Oxygen d
 
 |![](https://i.imgur.com/sqW6fB6.gif)|![](https://i.imgur.com/S8cIqgH.gif)|
 |--|--|
-|*Xenon CL is a prime example of what Hydra can do*|*In this example Hydra runs a program and displays whats inside the *|
+|*Xenon CL is a prime example of what Hydra file management system*|*In this example Hydra runs a program and displays whats inside the folders system based on the user*|
 
 
 
