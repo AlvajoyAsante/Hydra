@@ -1,7 +1,5 @@
-# Hydra
+# Hydra ![](https://img.shields.io/github/release/Overload02/Hydra) ![](https://img.shields.io/github/issues/Overload02/Hydra)
 ![](https://i.imgur.com/Px46HVE.png)
-
-![](https://img.shields.io/github/release/Overload02/Hydra) ![](https://img.shields.io/github/issues/Overload02/Hydra)
 
 > *Hydra is a filesystem API for the [CE C Toolchain](https://github.com/CE-Programming/toolchain). with its many features; Hydra allows you to make users and manage files that belongs to different users.*
 
