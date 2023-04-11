@@ -14,7 +14,6 @@ Visit the Hydra documentation for information on setting up Hydra with the [CE C
   - Folder System
   - User Management
   - Saving and Loading to Appvar
-  - ZX7 Data Compression
   - ...
 
 ## Getting Help
