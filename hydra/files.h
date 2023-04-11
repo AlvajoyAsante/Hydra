@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023
  *
  * BSD 3-Clause License
- * Copyright (c) 2023, the respective contributors, as shown by the AUTHORS file.
+ * Copyright (c) 2023, Alvajoy 'Alvajoy123' Asante.
  * All rights reserved.
  *
  * 	Redistribution and use in source and binary forms, with or without
