@@ -74,34 +74,31 @@ extern "C"
 	};
 
 	/**
-	 * @brief Users
+	 * @brief Users Structure 
 	 */
 	struct hydra_user_t
 	{
 		uint8_t user_id;
+		
 		gfx_sprite_t *icon;
-
 		char name[10];
 		char password[16];
-
-		/* user permission (limitation) */
-		uint8_t type;
-
-		/* User login in management */
-		int login_time[5];
 		char description[16];
+
+		int login_time[5];
+		uint8_t permission_type;
 
 		struct hydra_file_system_t *file_system;
 	};
 	extern struct hydra_user_t *hydra_user;
 
 	/**
-	 * @brief stores amount of users
+	 * @brief User system information
 	 */
 	struct hydra_user_system_t
 	{
-		uint8_t amount; // amount of users
-		int curr_id;	// current logged user
+		uint8_t amount;
+		int curr_id;
 	};
 	extern struct hydra_user_system_t hydra_user_system;
 

@@ -79,7 +79,7 @@ extern "C"
     };
 
     /**
-     * @brief File System Struct.
+     * @brief File Linked List
      */
     struct hydra_files_t
     {
@@ -102,7 +102,7 @@ extern "C"
     extern struct hydra_files_t *hydra_file;
 
     /**
-     * @brief Folder tree struct.
+     * @brief Folder Linked List
      */
     struct hydra_folders_t
     {
