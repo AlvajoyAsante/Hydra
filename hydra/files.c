@@ -723,30 +723,38 @@ int hydra_EditProgram(struct hydra_files_t *file, const char *editor_name, os_ru
 	ti_var_t slot;
 	char *progname;
 
+	/* Checks if there is a valid editor name and file */
 	if (editor_name == NULL || file == NULL)
 		return -1;
 
 	progname = file->name;
 
-	if ((slot = ti_OpenVar(editor_name, "r", OS_TYPE_PRGM)))
-	{ // Search for Editor
+	/* Checks for the editor to make sure it exists */
+	if ((slot = ti_OpenVar(editor_name, "r", OS_TYPE_PRGM))) // What if the editor is not basic???
+	{
 
+		/* Checks for the file to make sure it exists */
 		if ((slot = ti_OpenVar(progname, "r", OS_TYPE_PRGM)))
-		{ // Search for Program
+		{
 			ti_Close(slot);
+
+			/* Sets the Ans to program developer wants to edit */
 			if (!ti_SetVar(OS_TYPE_STR, OS_VAR_ANS, progname))
 			{
+				/* Runs the program */
 				if (!os_RunPrgm(editor_name, NULL, 0, callback))
-					return 0;
+				{
+					return 0; // Program ended up running
+				}
+
+				return -4; // Program wasn't able to run
 			}
 		}
 		else
-			return -3;
+			return -3; // Program develop wanted to edit was not found
 	}
 	else
-		return -2;
-
-	return 0;
+		return -2; // Editor Program was not found
 }
 
 int hydra_RunProgram(struct hydra_files_t *file, os_runprgm_callback_t callback)
@@ -754,15 +762,17 @@ int hydra_RunProgram(struct hydra_files_t *file, os_runprgm_callback_t callback)
 	char *progname;
 	int value;
 
+	/* Check if the file point doesn't exist */
 	if (file == NULL)
 		return -1;
 
 	progname = file->name;
 
+	/* Run program and check for error */
 	if ((value = os_RunPrgm(progname, NULL, 0, callback)) != 0)
 	{
-		return value;
+		return value; // Return any error code produced by os_RunPrgm
 	}
 
-	return 0;
+	return 0; // Return zero if program was ran
 }
