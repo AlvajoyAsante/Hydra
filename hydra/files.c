@@ -61,14 +61,21 @@ struct hydra_folders_t *SearchFolder(char *name, struct hydra_folders_t *locatio
 	return NULL;
 }
 
+/**
+ * @brief Check for a name in the file system
+ *
+ * @param name Name of file
+ * @return true file was found in the file system
+ * @return false file was not found in the file system
+ */
 static bool FindFile(char *name)
 {
 	for (int i = 0; i < hydra_file_system.numfiles; i++)
 	{
 		if (!strcmp(hydra_file[i].name, name))
-			return 1;
+			return true;
 	}
-	return 0;
+	return false;
 }
 
 void hydra_CheckFileSystem(void)
@@ -338,8 +345,17 @@ bool hydra_DeleteFolder(struct hydra_folders_t *folder)
 	return true;
 }
 
+/**
+ * @brief Checks if a file is contained by any other user
+ *
+ * @param file pointer to the file
+ * @param user_id index of where the 
+ * @return true file is contained by any other user
+ * @return false file is not contained by any other user
+ */
 static bool _isContainedByOtherUsers(struct hydra_files_t *file, uint8_t user_id)
 {
+
 	// Check if the user id is in range
 	if (!(user_id >= 0 && user_id <= HYDRA_MAX_USERS))
 		return false;
@@ -367,7 +383,7 @@ bool hydra_DeleteFile(struct hydra_files_t *file)
 {
 	struct hydra_user_t *curr_user;
 
-	if (HYDRA_CURR_USER_ID < 0)
+	if (HYDRA_CURR_USER_ID < 0 || file == NULL)
 		return false;
 
 	// Check if there is files in the file system and check if the file is owned by the user
@@ -469,8 +485,18 @@ struct hydra_folders_t *hydra_AddFolder(char *name, struct hydra_folders_t *loca
 	return NULL;
 }
 
+/**
+ * @brief Reset any owners contained within the file
+ *
+ * @param curr_file pointer to the file
+ */
 static void _ResetFileOwners(struct hydra_files_t *curr_file)
 {
+	if (curr_file == NULL)
+	{
+		return;
+	}
+
 	for (int i = 0; i < HYDRA_MAX_USERS; i++)
 	{
 		curr_file->user_id[i] = -1;
@@ -479,6 +505,11 @@ static void _ResetFileOwners(struct hydra_files_t *curr_file)
 
 static void _ResetFileLocations(struct hydra_files_t *curr_file)
 {
+	if (curr_file == NULL)
+	{
+		return;
+	}
+
 	for (int i = 0; i < HYDRA_MAX_USERS; i++)
 	{
 		curr_file->location[i] = NULL;
@@ -487,6 +518,11 @@ static void _ResetFileLocations(struct hydra_files_t *curr_file)
 
 static void _ResetFilePinned(struct hydra_files_t *curr_file)
 {
+	if (curr_file == NULL)
+	{
+		return;
+	}
+
 	for (int i = 0; i < HYDRA_MAX_USERS; i++)
 	{
 		curr_file->pinned[i] = false;
