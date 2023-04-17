@@ -17,7 +17,7 @@ static void _initialise(uint8_t type)
 		hydra_InitFilesSystem();
 
 		/* Detect Files on calculator system */
-		hydra_DetectAllFiles();
+		hydra_Detect(HYDRA_SOFT_SEARCH);
 		break;
 
 	case HYDRA_USERS_TYPE:
@@ -56,7 +56,7 @@ bool hydra_Load(void)
 			ti_Read(hydra_file, HYDRA_NUM_FILES * sizeof(struct hydra_files_t), 1, slot);
 
 			/* Check for any changes in file system */
-			hydra_CheckFileSystem();
+			hydra_Detect(HYDRA_HARD_SEARCH);
 
 			dbg_sprintf(dbgout, "Hydra: Loaded file system...\n"); // debugging information
 		}

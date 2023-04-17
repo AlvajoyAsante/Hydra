@@ -65,6 +65,17 @@ extern "C"
 {
 #endif /* __cplusplus */
     /**
+     * @brief Enum of hydra search type
+     * 
+     */
+    enum hydra_search_type_t {
+        HYDRA_HARD_SEARCH,  // RESCAN AND CHECK FOR DELETED FILES 
+        HYDRA_SOFT_SEARCH,  // SCAN WITHOUT RESCANNING
+        HYDRA_RESCAN_SEARCH
+    };
+    
+    
+    /**
      * @brief Enum of hydra file types
      *
      */
@@ -77,7 +88,7 @@ extern "C"
         HYDRA_C_TYPE,
         HYDRA_ASM_TYPE,
         HYDRA_APPVAR_TYPE,
-        HYDRA_ERROR_TYPE,
+        HYDRA_ERROR_TYPE
     };
 
     /**
@@ -88,7 +99,7 @@ extern "C"
         uint8_t user_id[HYDRA_MAX_USERS];
 
         char name[9];
-        uint8_t type;
+        enum hydra_file_type_t type;
 
         gfx_sprite_t *icon;
         char *description;
@@ -142,6 +153,9 @@ extern "C"
      */
     void hydra_InitFilesSystem(void);
 
+
+    /* Searching for file and folder */
+    
     /**
      * @brief Searches for a file and returns it's pointer
      *
@@ -160,22 +174,35 @@ extern "C"
      */
     struct hydra_folders_t *SearchFolder(char *name, struct hydra_folders_t *location);
 
+
+    /* Detecting Files in TI-OS */
+    /**
+     * @brief Detect all files on TI-OS and uploads it into file system/
+     * 
+     * @param type search type
+     * @return true all files where detected and uploaded
+     * @return false files were not detected and uploaded
+     */
+    bool hydra_Detect(enum hydra_search_type_t type);
+    
+    
     /**
      * @brief Check through file system and removes any files that don't belong.
      *
      */
-    void hydra_CheckFileSystem(void);
+    // void hydra_CheckFileSystem(void);
 
     /**
      * @brief Rescan the file system to check for new files.
      *
      */
-    void hydra_RescanFileSystem(void);
+    // void hydra_RescanFileSystem(void);
 
     /**
      * @brief Detects all files on calculator (programs and app-vars).
      */
-    void hydra_DetectAllFiles(void);
+    // void hydra_DetectAllFiles(void);
+
 
     /* Deleting folders and files */
 

@@ -8,7 +8,17 @@
 struct hydra_user_t *hydra_user;
 struct hydra_user_system_t hydra_user_system;
 
-struct hydra_user_t *hydra_CreateUser(char *name, char *password, uint8_t type)
+void hydra_InitUserSystem(void)
+{
+	/* Setting User System Information */
+	HYDRA_USER_AMOUNT = 0;
+	HYDRA_CURR_USER_ID = -1;
+
+	/* Setting User System Settings */
+	HYDRA_SETTINGS_CAN_RUN = HYDRA_SETTINGS_CAN_PIN = HYDRA_SETTINGS_CAN_EDIT = true;
+}
+
+struct hydra_user_t *hydra_CreateUser(char *name, char *password, uint8_t permission_type)
 {
 	struct hydra_user_t *curr_user;
 
@@ -25,7 +35,7 @@ struct hydra_user_t *hydra_CreateUser(char *name, char *password, uint8_t type)
 		/* User Icon */
 		curr_user->icon = NULL;
 
-		/* Username and Password */
+		/* Sets Username */
 		if (name != NULL)
 		{
 			hydra_SetUserName(curr_user, name);
@@ -35,6 +45,7 @@ struct hydra_user_t *hydra_CreateUser(char *name, char *password, uint8_t type)
 			curr_user->name[0] = '\0';
 		}
 
+		/* Sets Password */
 		if (password != NULL)
 		{
 			hydra_SetUserPassword(curr_user, password);
@@ -44,15 +55,13 @@ struct hydra_user_t *hydra_CreateUser(char *name, char *password, uint8_t type)
 			curr_user->password[0] = '\0';
 		}
 
-		/* type and login data */
-		curr_user->type = type;
-		curr_user->login_time[0] = -1; // -1 means there is currently no login time.
-		curr_user->description[0] = '\0';
+		/* initialise type and login data */
+		curr_user->permission_type = permission_type;
+		curr_user->login_time[0] = -1;	  // -1 means there is currently no login time.
+		curr_user->description[0] = '\0'; // No description
 
 		/* File system information */
-
-		// Allocate space fore data
-		curr_user->file_system = malloc(sizeof(struct hydra_file_system_t));
+		curr_user->file_system = malloc(sizeof(struct hydra_file_system_t)); // Allocate space fore data
 		curr_user->file_system->numfiles = curr_user->file_system->numfolders = curr_user->file_system->numpins = 0;
 
 		return curr_user;
@@ -61,14 +70,14 @@ struct hydra_user_t *hydra_CreateUser(char *name, char *password, uint8_t type)
 	return NULL;
 }
 
-struct hydra_user_t *hydra_SearchUser(char *name, uint8_t type)
+struct hydra_user_t *hydra_SearchUser(char *name, uint8_t permission_type)
 {
 	struct hydra_user_t *curr_user;
 
 	for (int i = 0; i < HYDRA_USER_AMOUNT; i++)
 	{
 		curr_user = &hydra_user[i];
-		if (!strcmp(curr_user->name, name) && curr_user->type == type)
+		if (!strcmp(curr_user->name, name) && curr_user->permission_type == permission_type)
 		{
 			return curr_user;
 		}

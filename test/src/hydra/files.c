@@ -14,7 +14,11 @@ struct hydra_file_system_t hydra_file_system;
 /* Setting up the file system */
 void hydra_InitFilesSystem(void)
 {
+	/* Setting File System Information */
 	HYDRA_NUM_FOLDERS = HYDRA_NUM_FILES = HYDRA_NUM_PINS = 0;
+
+	/* Setting File System Settings */
+	HYDRA_SETTINGS_ICON = HYDRA_SETTINGS_SORT = true;
 
 	// Create a folder called home in the root of the filesystem (This is where all the programs are held)
 	struct hydra_folders_t *home_folder = hydra_AddFolder("HOME", NULL); // ROOT
@@ -61,32 +65,30 @@ struct hydra_folders_t *SearchFolder(char *name, struct hydra_folders_t *locatio
 	return NULL;
 }
 
-static bool FindFile(char *name)
+/**
+ * @brief Check for a name in the file system
+ *
+ * @param name Name of file
+ * @return true file was found in the file system
+ * @return false file was not found in the file system
+ */
+static bool _FindFile(char *name)
 {
 	for (int i = 0; i < hydra_file_system.numfiles; i++)
 	{
 		if (!strcmp(hydra_file[i].name, name))
-			return 1;
+			return true;
 	}
-	return 0;
+	return false;
 }
 
-void hydra_CheckFileSystem(void)
+static int _FilesInOS(void)
 {
-
 	void *search_pos = NULL;
 	char *file_name;
 	uint8_t type;
-	ti_var_t slot;
+
 	int count = 0;
-	struct hydra_user_t *curr_user;
-
-	// Check if there user system is setup
-	if (HYDRA_CURR_USER_ID < 0)
-		return;
-
-	// Assign user in position
-	curr_user = &hydra_user[HYDRA_CURR_USER_ID];
 
 	// Count all files on the calculator
 	while ((file_name = ti_DetectAny(&search_pos, NULL, &type)) != NULL)
@@ -100,89 +102,108 @@ void hydra_CheckFileSystem(void)
 		}
 	}
 
-	// There was a file add on the calculator.
-	if (count > curr_user->file_system->numfiles)
-	{
-		hydra_RescanFileSystem();
-		dbg_sprintf(dbgout, "Check: New files added.\n");
-		return;
-	}
-
-	// There was a file deleted off the calculator.
-	if (count < curr_user->file_system->numfiles)
-	{
-		for (int i = 0; i < hydra_file_system.numfiles; i++)
-		{
-
-			if (!(slot = ti_OpenVar(hydra_file[i].name, "r", type)))
-			{
-				hydra_DeleteFile(&hydra_file[i]);
-				ti_Close(slot);
-				dbg_sprintf(dbgout, "Check: Deleted File.\n");
-			}
-		}
-	}
-
-	// Get icons for programs
-	hydra_GetAsmIcons();
-	hydra_GetBasicIcons();
-
-	dbg_sprintf(dbgout, "Check: Finished Checking.\n");
+	return count;
 }
 
-void hydra_RescanFileSystem(void)
+bool hydra_Detect(enum hydra_search_type_t search_type)
 {
 	void *search_pos = NULL;
 	char *file_name;
-	uint8_t type;
-
+	uint8_t type = '\0';
 	ti_var_t slot;
+	struct hydra_user_t *curr_user;
 	struct hydra_files_t *curr_file;
+	int count = 0;
 
-	while ((file_name = ti_DetectAny(&search_pos, NULL, &type)) != NULL)
+	/* Check if the user is logged in the system */
+	if (HYDRA_CURR_USER_ID < 0)
+		return false;
+
+	curr_user = &hydra_user[HYDRA_CURR_USER_ID];
+
+	switch (search_type)
 	{
-		if (type == OS_TYPE_PRGM || type == OS_TYPE_PROT_PRGM || type == OS_TYPE_APPVAR)
+	case HYDRA_HARD_SEARCH:
+		count = _FilesInOS();
+
+		if (count > curr_user->file_system->numfiles)
 		{
-			if ((*file_name != '!') && (*file_name != '#'))
+			hydra_Detect(HYDRA_RESCAN_SEARCH);
+			dbg_sprintf(dbgout, "Check: New files added.\n");
+			return true;
+		}
+
+		if (count < curr_user->file_system->numfiles)
+		{
+			for (int i = 0; i < hydra_file_system.numfiles; i++)
 			{
-				// Check if the file exist in file system
-				if (!FindFile(file_name))
+
+				if (!(slot = ti_OpenVar(hydra_file[i].name, "r", type)))
 				{
-					dbg_sprintf(dbgout, "Rescan: Added File.\n");
+					hydra_DeleteFile(&hydra_file[i]);
+					ti_Close(slot);
+					dbg_sprintf(dbgout, "Check: Deleted File.\n");
+					return true;
+				}
+			}
+		}
+		break;
+
+	default:
+
+		dbg_sprintf(dbgout, "Detect: File System Search Began! \n");
+
+		while ((file_name = ti_DetectAny(&search_pos, NULL, &type)) != NULL)
+		{
+			if (type == OS_TYPE_PRGM || type == OS_TYPE_PROT_PRGM || type == OS_TYPE_APPVAR)
+			{
+				/* Make sure were not getting files that aren't crazy <_< */
+				if ((*file_name != '!') && (*file_name != '#'))
+				{
+					/* Checks if the user wants to rescan */
+					if (search_type == HYDRA_RESCAN_SEARCH)
+					{
+						/* Checks if the file exist in the file system */
+						if (_FindFile(file_name))
+						{
+							continue;
+						}
+					}
+
 					if ((slot = ti_OpenVar(file_name, "r", type)))
 					{
-						dbg_sprintf(dbgout, "Rescan: Opened File!, Name: %s\n", file_name);
+						dbg_sprintf(dbgout, "Detect: Opened File!, Name: %s\n", file_name);
 
-						// Check if there is space for a file
+						/* Checks if there is space for a file */
 						if (hydra_AddFile(file_name, NULL) == NULL)
 						{
 							ti_Close(slot);
-							return;
+							return false;
 						}
 
-						dbg_sprintf(dbgout, "Rescan: Space Added File.\n");
+						dbg_sprintf(dbgout, "Detect: Allocated File.\n");
 
 						curr_file = &hydra_file[hydra_file_system.numfiles - 1];
 
 						switch (type)
 						{
-						case (OS_TYPE_PRGM):
+						case OS_TYPE_PRGM:
 							curr_file->type = HYDRA_BASIC_TYPE;
 							curr_file->location[HYDRA_CURR_USER_ID] = &hydra_folder[0];
 							break;
 
-						case (OS_TYPE_PROT_PRGM):
+						case OS_TYPE_PROT_PRGM:
 							curr_file->type = HYDRA_PBASIC_TYPE;
 							curr_file->location[HYDRA_CURR_USER_ID] = &hydra_folder[0];
 							break;
 
-						case (OS_TYPE_APPVAR):
+						case OS_TYPE_APPVAR:
 							curr_file->type = HYDRA_APPVAR_TYPE;
 							curr_file->location[HYDRA_CURR_USER_ID] = &hydra_folder[1];
 							break;
 
 						default:
-							curr_file->type = HYDRA_ERROR_TYPE; // error
+							curr_file->type = HYDRA_ERROR_TYPE;
 							curr_file->location[HYDRA_CURR_USER_ID] = &hydra_folder[0];
 							break;
 						}
@@ -195,98 +216,34 @@ void hydra_RescanFileSystem(void)
 						curr_file->icon = NULL;
 						curr_file->description = NULL;
 
-						dbg_sprintf(dbgout, "Rescan: File Done!.\n");
+						dbg_sprintf(dbgout, "Detect: File Done!.\n");
 
 						ti_Close(slot);
 					}
 				}
 			}
 		}
+
+		dbg_sprintf(dbgout, "Detect: Finished search.\n");
+		break;
 	}
 
-	hydra_SortFiles();
-	hydra_GetAsmIcons();
-	hydra_GetBasicIcons();
-
-	dbg_sprintf(dbgout, "Rescan: Rescan Finished!\n");
-}
-
-void hydra_DetectAllFiles(void)
-{
-	void *search_pos = NULL;
-	char *file_name;
-	uint8_t type;
-
-	ti_var_t slot;
-	struct hydra_files_t *curr_file;
-
-	dbg_sprintf(dbgout, "Oxygen: File System Search Began! \n");
-
-	while ((file_name = ti_DetectAny(&search_pos, NULL, &type)) != NULL)
+	/* Check if the hydra settings allows sorting */
+	if (HYDRA_SETTINGS_SORT)
 	{
-		if (type == OS_TYPE_PRGM || type == OS_TYPE_PROT_PRGM || type == OS_TYPE_APPVAR)
-		{
-			if ((*file_name != '!') && (*file_name != '#'))
-			{
-				if ((slot = ti_OpenVar(file_name, "r", type)))
-				{
-					dbg_sprintf(dbgout, "Oxygen: Opened File!, Name: %s\n", file_name);
-
-					// Check if there is space for a file
-					if (hydra_AddFile(file_name, NULL) == NULL)
-					{
-						ti_Close(slot);
-						return;
-					}
-
-					dbg_sprintf(dbgout, "Search: Allocated File.\n");
-
-					curr_file = &hydra_file[hydra_file_system.numfiles - 1];
-
-					switch (type)
-					{
-					case OS_TYPE_PRGM:
-						curr_file->type = HYDRA_BASIC_TYPE;
-						curr_file->location[HYDRA_CURR_USER_ID] = &hydra_folder[0];
-						break;
-
-					case OS_TYPE_PROT_PRGM:
-						curr_file->type = HYDRA_PBASIC_TYPE;
-						curr_file->location[HYDRA_CURR_USER_ID] = &hydra_folder[0];
-						break;
-
-					case OS_TYPE_APPVAR:
-						curr_file->type = HYDRA_APPVAR_TYPE;
-						curr_file->location[HYDRA_CURR_USER_ID] = &hydra_folder[1];
-						break;
-
-					default:
-						curr_file->type = HYDRA_ERROR_TYPE;
-						curr_file->location[HYDRA_CURR_USER_ID] = &hydra_folder[0];
-						break;
-					}
-
-					curr_file->locked = false;
-
-					curr_file->size = ti_GetSize(slot);
-					curr_file->archived = ti_IsArchived(slot);
-
-					curr_file->icon = NULL;
-					curr_file->description = NULL;
-
-					dbg_sprintf(dbgout, "Search: File Done!.\n");
-
-					ti_Close(slot);
-				}
-			}
-		}
+		hydra_SortFiles();
+		dbg_sprintf(dbgout, "Detect: Sorted files.\n");
 	}
 
-	dbg_sprintf(dbgout, "Search: Finished search.\n");
+	/* Check if the hydra settings allow icon detecting  */
+	if (HYDRA_SETTINGS_ICON)
+	{
+		hydra_GetAsmIcons();
+		hydra_GetBasicIcons();
+		dbg_sprintf(dbgout, "Detect: Set Icons.\n");
+	}
 
-	hydra_SortFiles();
-	hydra_GetAsmIcons();
-	hydra_GetBasicIcons();
+	return true;
 }
 
 /* Deleting folders and files */
@@ -338,8 +295,17 @@ bool hydra_DeleteFolder(struct hydra_folders_t *folder)
 	return true;
 }
 
+/**
+ * @brief Checks if a file is contained by any other user
+ *
+ * @param file pointer to the file
+ * @param user_id index of where the
+ * @return true file is contained by any other user
+ * @return false file is not contained by any other user
+ */
 static bool _isContainedByOtherUsers(struct hydra_files_t *file, uint8_t user_id)
 {
+
 	// Check if the user id is in range
 	if (!(user_id >= 0 && user_id <= HYDRA_MAX_USERS))
 		return false;
@@ -367,7 +333,7 @@ bool hydra_DeleteFile(struct hydra_files_t *file)
 {
 	struct hydra_user_t *curr_user;
 
-	if (HYDRA_CURR_USER_ID < 0)
+	if (HYDRA_CURR_USER_ID < 0 || file == NULL)
 		return false;
 
 	// Check if there is files in the file system and check if the file is owned by the user
@@ -469,8 +435,18 @@ struct hydra_folders_t *hydra_AddFolder(char *name, struct hydra_folders_t *loca
 	return NULL;
 }
 
+/**
+ * @brief Reset any owners contained within the file
+ *
+ * @param curr_file pointer to the file
+ */
 static void _ResetFileOwners(struct hydra_files_t *curr_file)
 {
+	if (curr_file == NULL)
+	{
+		return;
+	}
+
 	for (int i = 0; i < HYDRA_MAX_USERS; i++)
 	{
 		curr_file->user_id[i] = -1;
@@ -479,6 +455,11 @@ static void _ResetFileOwners(struct hydra_files_t *curr_file)
 
 static void _ResetFileLocations(struct hydra_files_t *curr_file)
 {
+	if (curr_file == NULL)
+	{
+		return;
+	}
+
 	for (int i = 0; i < HYDRA_MAX_USERS; i++)
 	{
 		curr_file->location[i] = NULL;
@@ -487,6 +468,11 @@ static void _ResetFileLocations(struct hydra_files_t *curr_file)
 
 static void _ResetFilePinned(struct hydra_files_t *curr_file)
 {
+	if (curr_file == NULL)
+	{
+		return;
+	}
+
 	for (int i = 0; i < HYDRA_MAX_USERS; i++)
 	{
 		curr_file->pinned[i] = false;
@@ -619,7 +605,7 @@ void hydra_GetBasicIcons(void)
 
 		struct hydra_files_t *curr_file = &hydra_file[i];
 
-		// Check if the program is owened by current user, don't waste computation on this file
+		// Check if the program is owned by current user, don't waste computation on this file
 		if (curr_file->user_id[HYDRA_CURR_USER_ID] != HYDRA_CURR_USER_ID)
 			continue;
 		;
@@ -723,28 +709,51 @@ int hydra_EditProgram(struct hydra_files_t *file, const char *editor_name, os_ru
 	ti_var_t slot;
 	char *progname;
 
+	/* Check for user */
+	if (HYDRA_CURR_USER_ID < 0)
+	{
+		return -2;
+	}
+
+	/* Check if the user is a guest */
+	if (hydra_user[HYDRA_CURR_USER_ID].permission_type == HYDRA_GUEST_TYPE)
+	{
+		return -2;
+	}
+
+	/* Checks if there is a valid editor name and file */
 	if (editor_name == NULL || file == NULL)
 		return -1;
 
 	progname = file->name;
 
-	if ((slot = ti_OpenVar(editor_name, "r", OS_TYPE_PRGM)))
-	{ // Search for Editor
+	/* Checks for the editor to make sure it exists */
+	if ((slot = ti_OpenVar(editor_name, "r", OS_TYPE_PRGM))) // What if the editor is not basic???
+	{
+		ti_Close(slot);
 
+		/* Checks for the file to make sure it exists */
 		if ((slot = ti_OpenVar(progname, "r", OS_TYPE_PRGM)))
-		{ // Search for Program
+		{
 			ti_Close(slot);
+
+			/* Sets the Ans to program developer wants to edit */
 			if (!ti_SetVar(OS_TYPE_STR, OS_VAR_ANS, progname))
 			{
-				if (!os_RunPrgm(editor_name, NULL, 0, callback))
-					return 0;
+				/* Runs the program */
+				if (os_RunPrgm(editor_name, NULL, 0, callback))
+				{
+					return -5; // Program ended up running
+				}
+
+				return -4; // Program wasn't able to run
 			}
 		}
 		else
-			return -3;
+			return -3; // Program develop wanted to edit was not found
 	}
 	else
-		return -2;
+		return -3; // Editor Program was not found
 
 	return 0;
 }
@@ -754,15 +763,17 @@ int hydra_RunProgram(struct hydra_files_t *file, os_runprgm_callback_t callback)
 	char *progname;
 	int value;
 
+	/* Check if the file point doesn't exist */
 	if (file == NULL)
 		return -1;
 
 	progname = file->name;
 
+	/* Run program and check for error */
 	if ((value = os_RunPrgm(progname, NULL, 0, callback)) != 0)
 	{
-		return value;
+		return value; // Return any error code produced by os_RunPrgm
 	}
 
-	return 0;
+	return 0; // Return zero if program was ran
 }
