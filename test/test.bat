@@ -29,8 +29,9 @@ xcopy /y/s/i "..\hydra" .\src\hydra
 cls
 
 :: Compiles all the program in order to test for errors and bugs
+:: make %debug
 make
-PAUSE 
+set /p dummyVar= 
 
 :: Once the bug has been fixed then cleans via dev then the screen is cleared. 
 cls

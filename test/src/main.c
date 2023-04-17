@@ -2,15 +2,14 @@
  *--------------------------------------
  * Program Name: Demo
  * Author: Alvajoy Asante
- * Description: Oxygen Demo
+ * Description: Hydra Demo
  *--------------------------------------
 */
 
-// Needed Headers
 #include <tice.h>
 #include <graphx.h>
 
-// #include "hydra/hydra.h"
+#include "hydra/hydra.h"
 
 int main(void)
 {
