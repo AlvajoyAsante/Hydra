@@ -51,6 +51,9 @@
 #define HYDRA_CURR_USER_ID hydra_user_system.curr_id
 #define HYDRA_USER_AMOUNT hydra_user_system.amount
 #define HYDRA_MAX_USERS 8
+#define HYDRA_SETTINGS_CAN_RUN	hydra_user_system.users_can_run
+#define HYDRA_SETTINGS_CAN_PIN	hydra_user_system.users_can_pin
+#define HYDRA_SETTINGS_CAN_EDIT	hydra_user_system.users_can_edit
 
 #include <tice.h>
 #include <graphx.h>
@@ -74,12 +77,12 @@ extern "C"
 	};
 
 	/**
-	 * @brief Users Structure 
+	 * @brief Users Structure
 	 */
 	struct hydra_user_t
 	{
 		uint8_t user_id;
-		
+
 		gfx_sprite_t *icon;
 		char name[10];
 		char password[16];
@@ -93,14 +96,26 @@ extern "C"
 	extern struct hydra_user_t *hydra_user;
 
 	/**
-	 * @brief User system information
+	 * @brief User system information and settings
 	 */
 	struct hydra_user_system_t
 	{
+		/* Information */
 		uint8_t amount;
 		int curr_id;
+
+		/* Settings */
+		bool users_can_run;
+		bool users_can_pin;
+		bool users_can_edit;
 	};
 	extern struct hydra_user_system_t hydra_user_system;
+
+	/**
+	 * @brief Init the user system for use.
+	 * 
+	 */
+	void hydra_InitUserSystem(void);
 
 	/**
 	 * @brief Create a user

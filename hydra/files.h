@@ -14,7 +14,7 @@
  * 888    888       888       888    888    888 T88b      d88P   888
  * 888    888       888       888  .d88P    888  T88b    d8888888888
  * 888    888       888       8888888P"     888   T88b  d88P     888
- * 
+ *
  * BSD 3-Clause License
  * Copyright (c) 2023, Alvajoy 'Alvajoy123' Asante.
  * All rights reserved.
@@ -52,6 +52,8 @@
 #define HYDRA_NUM_FOLDERS hydra_file_system.numfolders
 #define HYDRA_NUM_FILES hydra_file_system.numfiles
 #define HYDRA_NUM_PINS hydra_file_system.numpins
+#define HYDRA_SETTINGS_SORT hydra_file_system.detect_get_icons
+#define HYDRA_SETTINGS_ICON hydra_file_system.detect_sort_files
 
 #include <tice.h>
 #include <graphx.h>
@@ -120,13 +122,18 @@ extern "C"
     extern struct hydra_folders_t *hydra_folder;
 
     /**
-     * @brief File system information
+     * @brief File system information and settings
      */
     struct hydra_file_system_t
     {
+        /* Information */
         int numfiles;
         int numfolders;
         int numpins;
+
+        /* Settings */
+        bool detect_get_icons;
+        bool detect_sort_files;
     };
     extern struct hydra_file_system_t hydra_file_system;
 

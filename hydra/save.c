@@ -13,11 +13,18 @@ static void _initialise(uint8_t type)
 	switch (type)
 	{
 	case HYDRA_FILES_TYPE:
+		/* Initialise File System for use */
 		hydra_InitFilesSystem();
+
+		/* Detect Files on calculator system */
 		hydra_DetectAllFiles();
 		break;
 
 	case HYDRA_USERS_TYPE:
+		/* Initialise User System for use */
+		hydra_InitUserSystem();
+
+		/* Initialise User for User, File System */
 		hydra_CreateUser("ADMIN", NULL, HYDRA_ADMIN_TYPE);
 		break;
 	}
@@ -98,19 +105,22 @@ void hydra_Save(void)
 
 	/* Stores the files System */
 	ti_Write(&hydra_file_system, sizeof(struct hydra_file_system_t), 1, slot); // Basic information about the file system
-	
-	if (hydra_file_system.numfolders > 0 && hydra_folder != NULL ){ // Checks if there is any folders to store and make sure the pointer isn't NULL
+
+	if (hydra_file_system.numfolders > 0 && hydra_folder != NULL)
+	{ // Checks if there is any folders to store and make sure the pointer isn't NULL
 		ti_Write(hydra_folder, hydra_file_system.numfolders * sizeof(struct hydra_folders_t), 1, slot);
 	}
 
-	if (hydra_file_system.numfiles > 0 && hydra_file != NULL ) { // Checks if there is any files to store and make sure the pointer isn't NULL
+	if (hydra_file_system.numfiles > 0 && hydra_file != NULL)
+	{ // Checks if there is any files to store and make sure the pointer isn't NULL
 		ti_Write(hydra_file, hydra_file_system.numfiles * sizeof(struct hydra_files_t), 1, slot);
 	}
-	
+
 	/* Stores the user system */
 	ti_Write(&hydra_user_system, sizeof(struct hydra_user_system_t), 1, slot); // Basic information about the user system
-	
-	if (hydra_user_system.amount > 0 && hydra_user != NULL){ // Check if there is any users to store and make sure the pointer isn't NULL
+
+	if (hydra_user_system.amount > 0 && hydra_user != NULL)
+	{ // Check if there is any users to store and make sure the pointer isn't NULL
 		ti_Write(hydra_user, HYDRA_USER_AMOUNT * sizeof(struct hydra_user_t), 1, slot);
 	}
 

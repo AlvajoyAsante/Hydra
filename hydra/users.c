@@ -8,6 +8,16 @@
 struct hydra_user_t *hydra_user;
 struct hydra_user_system_t hydra_user_system;
 
+void hydra_InitUserSystem(void)
+{
+	/* Setting User System Information */
+	HYDRA_USER_AMOUNT = 0;
+	HYDRA_CURR_USER_ID = -1;
+
+	/* Setting User System Settings */
+	HYDRA_SETTINGS_CAN_RUN = HYDRA_SETTINGS_CAN_PIN = HYDRA_SETTINGS_CAN_EDIT = true;
+}
+
 struct hydra_user_t *hydra_CreateUser(char *name, char *password, uint8_t permission_type)
 {
 	struct hydra_user_t *curr_user;
@@ -25,7 +35,7 @@ struct hydra_user_t *hydra_CreateUser(char *name, char *password, uint8_t permis
 		/* User Icon */
 		curr_user->icon = NULL;
 
-		/* Username and Password */
+		/* Sets Username */
 		if (name != NULL)
 		{
 			hydra_SetUserName(curr_user, name);
@@ -35,6 +45,7 @@ struct hydra_user_t *hydra_CreateUser(char *name, char *password, uint8_t permis
 			curr_user->name[0] = '\0';
 		}
 
+		/* Sets Password */
 		if (password != NULL)
 		{
 			hydra_SetUserPassword(curr_user, password);
@@ -46,7 +57,7 @@ struct hydra_user_t *hydra_CreateUser(char *name, char *password, uint8_t permis
 
 		/* initialise type and login data */
 		curr_user->permission_type = permission_type;
-		curr_user->login_time[0] = -1; // -1 means there is currently no login time.
+		curr_user->login_time[0] = -1;	  // -1 means there is currently no login time.
 		curr_user->description[0] = '\0'; // No description
 
 		/* File system information */

@@ -14,7 +14,11 @@ struct hydra_file_system_t hydra_file_system;
 /* Setting up the file system */
 void hydra_InitFilesSystem(void)
 {
+	/* Setting File System Information */
 	HYDRA_NUM_FOLDERS = HYDRA_NUM_FILES = HYDRA_NUM_PINS = 0;
+
+	/* Setting File System Settings */
+	HYDRA_SETTINGS_ICON = HYDRA_SETTINGS_SORT = true;
 
 	// Create a folder called home in the root of the filesystem (This is where all the programs are held)
 	struct hydra_folders_t *home_folder = hydra_AddFolder("HOME", NULL); // ROOT
@@ -349,7 +353,7 @@ bool hydra_DeleteFolder(struct hydra_folders_t *folder)
  * @brief Checks if a file is contained by any other user
  *
  * @param file pointer to the file
- * @param user_id index of where the 
+ * @param user_id index of where the
  * @return true file is contained by any other user
  * @return false file is not contained by any other user
  */
@@ -759,6 +763,18 @@ int hydra_EditProgram(struct hydra_files_t *file, const char *editor_name, os_ru
 	ti_var_t slot;
 	char *progname;
 
+	/* Check for user */
+	if (HYDRA_CURR_USER_ID < 0)
+	{
+		return -2;
+	}
+
+	/* Check if the user is a guest */
+	if (hydra_user[HYDRA_CURR_USER_ID].permission_type == HYDRA_GUEST_TYPE)
+	{
+		return -2;
+	}
+
 	/* Checks if there is a valid editor name and file */
 	if (editor_name == NULL || file == NULL)
 		return -1;
@@ -768,6 +784,7 @@ int hydra_EditProgram(struct hydra_files_t *file, const char *editor_name, os_ru
 	/* Checks for the editor to make sure it exists */
 	if ((slot = ti_OpenVar(editor_name, "r", OS_TYPE_PRGM))) // What if the editor is not basic???
 	{
+		ti_Close(slot);
 
 		/* Checks for the file to make sure it exists */
 		if ((slot = ti_OpenVar(progname, "r", OS_TYPE_PRGM)))
@@ -790,7 +807,7 @@ int hydra_EditProgram(struct hydra_files_t *file, const char *editor_name, os_ru
 			return -3; // Program develop wanted to edit was not found
 	}
 	else
-		return -2; // Editor Program was not found
+		return -3; // Editor Program was not found
 }
 
 int hydra_RunProgram(struct hydra_files_t *file, os_runprgm_callback_t callback)
