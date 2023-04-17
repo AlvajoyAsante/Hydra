@@ -13,7 +13,7 @@ Visit the Hydra documentation for information on setting up Hydra with the [CE C
   - Running Assembly & Basic Programs
   - Folder System
   - User Management
-  - Saving and Loading to Appvar
+  - Saving and Loading from Appvar
   - ...
 
 ## Getting Help
@@ -35,4 +35,4 @@ You can join the Oxygen Programming Discord Server for help or read the Oxygen d
 ------------
 
 
- Copyright &copy; 2018 - 2022, ***Alvajoy Asante***
+ Copyright &copy; 2018 - 2023, ***Alvajoy Asante***
