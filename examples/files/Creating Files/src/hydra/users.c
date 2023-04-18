@@ -18,7 +18,7 @@ void hydra_InitUserSystem(void)
 	HYDRA_SETTINGS_CAN_RUN = HYDRA_SETTINGS_CAN_PIN = HYDRA_SETTINGS_CAN_EDIT = true;
 }
 
-struct hydra_user_t *hydra_CreateUser(char *name, char *password, enum hydra_user_permission_t permission_type)
+struct hydra_user_t *hydra_CreateUser(char *name, char *password, uint8_t permission_type)
 {
 	struct hydra_user_t *curr_user;
 
@@ -70,7 +70,7 @@ struct hydra_user_t *hydra_CreateUser(char *name, char *password, enum hydra_use
 	return NULL;
 }
 
-struct hydra_user_t *hydra_SearchUser(char *name, enum hydra_user_permission_t permission_type)
+struct hydra_user_t *hydra_SearchUser(char *name, uint8_t permission_type)
 {
 	struct hydra_user_t *curr_user;
 

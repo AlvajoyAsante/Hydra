@@ -54,8 +54,6 @@
 #define HYDRA_NUM_PINS hydra_file_system.numpins
 #define HYDRA_SETTINGS_SORT hydra_file_system.detect_get_icons
 #define HYDRA_SETTINGS_ICON hydra_file_system.detect_sort_files
-#define HYDRA_HOME_FOLDER hydra_file[0]
-#define HYDRA_APPVAR_FOLDER hydra_file[1]
 
 #include <tice.h>
 #include <graphx.h>
@@ -165,7 +163,7 @@ extern "C"
      * @param location pointer to the folder location can be NULL for home folder
      * @return struct hydra_files_t* if NULL many issues could have happened (either folder was not found or the was no initialization)
      */
-    struct hydra_files_t *hydra_SearchFile(char *name, struct hydra_folders_t *location);
+    struct hydra_files_t *SearchFile(char *name, struct hydra_folders_t *location);
 
     /**
      * @brief Searches for the folder and returns it's pointer
@@ -174,7 +172,7 @@ extern "C"
      * @param location pointer to the folder location can be NULL for home folder
      * @return struct hydra_folders_t* if NULL many issues could have happened (either folder was not found or the was no initialization)
      */
-    struct hydra_folders_t *hydra_SearchFolder(char *name, struct hydra_folders_t *location);
+    struct hydra_folders_t *SearchFolder(char *name, struct hydra_folders_t *location);
 
 
     /* Detecting Files in TI-OS */

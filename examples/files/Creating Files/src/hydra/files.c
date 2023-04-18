@@ -27,7 +27,7 @@ void hydra_InitFilesSystem(void)
 	hydra_AddFolder("APPVARS", home_folder); // INSIDE HOME.
 }
 
-struct hydra_files_t *hydra_SearchFile(char *name, struct hydra_folders_t *location)
+struct hydra_files_t *SearchFile(char *name, struct hydra_folders_t *location)
 {
 	if (HYDRA_CURR_USER_ID < 0)
 		return NULL;
@@ -46,7 +46,7 @@ struct hydra_files_t *hydra_SearchFile(char *name, struct hydra_folders_t *locat
 	return NULL;
 }
 
-struct hydra_folders_t *hydra_SearchFolder(char *name, struct hydra_folders_t *location)
+struct hydra_folders_t *SearchFolder(char *name, struct hydra_folders_t *location)
 {
 	// if there isn't an user logged return.
 	if (HYDRA_CURR_USER_ID < 0)

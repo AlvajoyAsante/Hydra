@@ -54,7 +54,6 @@
 #define HYDRA_SETTINGS_CAN_RUN	hydra_user_system.users_can_run
 #define HYDRA_SETTINGS_CAN_PIN	hydra_user_system.users_can_pin
 #define HYDRA_SETTINGS_CAN_EDIT	hydra_user_system.users_can_edit
-#define HYDRA_ADMIN_USER hydra_user[0]
 
 #include <tice.h>
 #include <graphx.h>
@@ -90,7 +89,7 @@ extern "C"
 		char description[16];
 
 		int login_time[5];
-		enum hydra_user_permission_t permission_type;
+		uint8_t permission_type;
 
 		struct hydra_file_system_t *file_system;
 	};
@@ -127,7 +126,7 @@ extern "C"
 	 * @return struct hydra_user_t* pointer to the position of the user
 	 * @return NULL	User could not be created many various reasons
 	 */
-	struct hydra_user_t *hydra_CreateUser(char *name, char *password, enum hydra_user_permission_t type);
+	struct hydra_user_t *hydra_CreateUser(char *name, char *password, uint8_t type);
 
 	/**
 	 * @brief Search for user based on name and type
@@ -137,7 +136,7 @@ extern "C"
 	 * @return struct hydra_user_t* pointer to the user file
 	 * @return NULL	The User wasn't found
 	 */
-	struct hydra_user_t *hydra_SearchUser(char *name, enum hydra_user_permission_t type);
+	struct hydra_user_t *hydra_SearchUser(char *name, uint8_t type);
 
 	/**
 	 * @brief Sets the description of a given user

@@ -1,7 +1,7 @@
 /**
- * @file save.h
- * @author Alvajoy 'Alvajoy123' Asante
- * @brief Saving / Loading system for files and users.
+ * @file hydra.h
+ * @author Alvajoy Asante
+ * @brief Linker file for sections for hydra
  * @version 0.1
  *
  * @copyright Copyright (c) 2023
@@ -45,64 +45,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef HYDRA_SAVE_H
-#define HYDRA_SAVE_H
+#ifndef OXYGEN_H
+#define OXYGEN_H
 
-#define HYDRA_APPVAR_NAME "HYDRA"
-#define HYDRA_VERSION_NUM 0
+// contains everything to work with the file system
+#include "files.h"
 
-#define hydra_FreeFiles() \
-	free(hydra_folder);   \
-	free(hydra_file);
+// contains everything pertaining to the user
+#include "users.h"
 
-#define hydra_FreeUsers() \
-	free(hydra_user);
+// contains everything pertaining to saving to hydra appvar
+#include "save.h"
 
-#define hydra_FreeAll() \
-	free(hydra_folder); \
-	free(hydra_file);   \
-	free(hydra_user);
-
-#define hydra_Begin() \
-	hydra_Load();
-
-#define hydra_End() \
-	hydra_Save();   \
-	hydra_FreeAll();
-
-#include <tice.h>
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif /* __cplusplus */
-
-	enum system_type_t
-	{
-		HYDRA_FILES_TYPE,
-		HYDRA_USERS_TYPE,
-	};
-
-	/**
-	 * @brief Global int used to compare version numbers.
-	 */
-	static int HYDRA_VERSION_HOLDER = HYDRA_VERSION_NUM;
-
-	/**
-	 * @brief Loads all systems of hydra from appvar
-	 *
-	 * @return true system was loaded
-	 * @return false system was not loaded
-	 */
-	bool hydra_LoadAll(void);
-
-	/**
-	 * @brief Save all systems to hydra appvar.
-	 */
-	void hydra_SaveAll(void);
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
-#endif /* __hydra_SAVE_H__ */
+#endif

@@ -51,24 +51,18 @@
 #define HYDRA_APPVAR_NAME "HYDRA"
 #define HYDRA_VERSION_NUM 0
 
+#define hydra_Begin() \
+	hydra_Load();
+
+#define hydra_End() \
+	hydra_Save();
+
 #define hydra_FreeFiles() \
 	free(hydra_folder);   \
 	free(hydra_file);
 
 #define hydra_FreeUsers() \
 	free(hydra_user);
-
-#define hydra_FreeAll() \
-	free(hydra_folder); \
-	free(hydra_file);   \
-	free(hydra_user);
-
-#define hydra_Begin() \
-	hydra_Load();
-
-#define hydra_End() \
-	hydra_Save();   \
-	hydra_FreeAll();
 
 #include <tice.h>
 
