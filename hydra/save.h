@@ -94,12 +94,12 @@ extern "C"
 	 * @return true system was loaded
 	 * @return false system was not loaded
 	 */
-	bool hydra_LoadAll(void);
+	bool hydra_Load(void);
 
 	/**
 	 * @brief Save all systems to hydra appvar.
 	 */
-	void hydra_SaveAll(void);
+	void hydra_Save(void);
 
 #ifdef __cplusplus
 }

@@ -54,8 +54,8 @@
 #define HYDRA_NUM_PINS hydra_file_system.numpins
 #define HYDRA_SETTINGS_SORT hydra_file_system.detect_get_icons
 #define HYDRA_SETTINGS_ICON hydra_file_system.detect_sort_files
-#define HYDRA_HOME_FOLDER &hydra_file[0]
-#define HYDRA_APPVAR_FOLDER &hydra_file[1]
+#define HYDRA_HOME_FOLDER &hydra_folder[0]
+#define HYDRA_APPVAR_FOLDER &hydra_folder[1]
 
 #include <tice.h>
 #include <graphx.h>

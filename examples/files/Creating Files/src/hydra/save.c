@@ -45,6 +45,20 @@ bool hydra_Load(void)
 			}
 		}
 
+		if (ti_Read(&hydra_user_system, sizeof(struct hydra_user_system_t), 1, slot))
+		{
+			hydra_user = malloc(HYDRA_USER_AMOUNT * sizeof(struct hydra_user_t));
+			ti_Read(hydra_user, HYDRA_USER_AMOUNT * sizeof(struct hydra_user_t), 1, slot);
+
+			dbg_sprintf(dbgout, "Hydra: Loaded user system...\n");
+		}
+		else
+		{
+			/* User system not found ... what should we do ... initialise the user system? */
+			_initialise(HYDRA_USERS_TYPE);
+			dbg_sprintf(dbgout, "Hydra: initiated user system...\n");
+		}
+
 		if (ti_Read(&hydra_file_system, sizeof(struct hydra_file_system_t), 1, slot))
 		{
 			/* Allocate space for the user files system */
@@ -67,31 +81,18 @@ bool hydra_Load(void)
 			dbg_sprintf(dbgout, "Hydra: initiated files system...\n");
 		}
 
-		if (ti_Read(&hydra_user_system, sizeof(struct hydra_user_system_t), 1, slot))
-		{
-			hydra_user = malloc(HYDRA_USER_AMOUNT * sizeof(struct hydra_user_t));
-			ti_Read(hydra_user, HYDRA_USER_AMOUNT * sizeof(struct hydra_user_t), 1, slot);
-
-			dbg_sprintf(dbgout, "Hydra: Loaded user system...\n");
-		}
-		else
-		{
-			/* User system not found ... what should we do ... initialise the user system? */
-			_initialise(HYDRA_USERS_TYPE);
-			dbg_sprintf(dbgout, "Hydra: initiated user system...\n");
-		}
-
+		/* Finished Loading Information */
 		ti_Close(slot);
 
 		dbg_sprintf(dbgout, "Hydra: Load Complete...\n");
 
 		return true;
 	}
-	else
-	{
-		/* The Hydra appvar was not found */
-		return false;
-	}
+
+	/* The Hydra appvar was not found */
+	_initialise(HYDRA_USERS_TYPE);
+	_initialise(HYDRA_FILES_TYPE);
+	return false;
 }
 
 void hydra_Save(void)
@@ -102,6 +103,14 @@ void hydra_Save(void)
 
 	/* Store the current version */
 	ti_Write(&HYDRA_VERSION_HOLDER, sizeof(int), 1, slot);
+
+	/* Stores the user system */
+	ti_Write(&hydra_user_system, sizeof(struct hydra_user_system_t), 1, slot); // Basic information about the user system
+
+	if (hydra_user_system.amount > 0 && hydra_user != NULL)
+	{ // Check if there is any users to store and make sure the pointer isn't NULL
+		ti_Write(hydra_user, HYDRA_USER_AMOUNT * sizeof(struct hydra_user_t), 1, slot);
+	}
 
 	/* Stores the files System */
 	ti_Write(&hydra_file_system, sizeof(struct hydra_file_system_t), 1, slot); // Basic information about the file system
@@ -114,14 +123,6 @@ void hydra_Save(void)
 	if (hydra_file_system.numfiles > 0 && hydra_file != NULL)
 	{ // Checks if there is any files to store and make sure the pointer isn't NULL
 		ti_Write(hydra_file, hydra_file_system.numfiles * sizeof(struct hydra_files_t), 1, slot);
-	}
-
-	/* Stores the user system */
-	ti_Write(&hydra_user_system, sizeof(struct hydra_user_system_t), 1, slot); // Basic information about the user system
-
-	if (hydra_user_system.amount > 0 && hydra_user != NULL)
-	{ // Check if there is any users to store and make sure the pointer isn't NULL
-		ti_Write(hydra_user, HYDRA_USER_AMOUNT * sizeof(struct hydra_user_t), 1, slot);
 	}
 
 	ti_SetArchiveStatus(1, slot);

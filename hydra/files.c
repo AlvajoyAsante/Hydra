@@ -281,7 +281,7 @@ int hydra_HideFile(struct hydra_files_t *file)
 	{
 		/* Hide the file from TI-OS and mark it as hidden */
 
-		if (!(slot = ti_OpenVar(file->name, "r+", type)))
+		if ((slot = ti_OpenVar(file->name, "r+", type)))
 		{
 			/* The file was found lets start editing */
 
@@ -320,7 +320,7 @@ int hydra_HideFile(struct hydra_files_t *file)
 	else
 	{
 		/* Un-Hide the file from TI-OS and un-mark it as hidden */
-		if (!(slot = ti_OpenVar(file->name, "r+", type)))
+		if ((slot = ti_OpenVar(file->name, "r+", type)))
 		{
 			/* The file was found lets start editing */
 			char temp[10] = {0};
