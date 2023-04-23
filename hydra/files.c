@@ -300,7 +300,7 @@ int hydra_HideFile(struct hydra_files_t *file)
 			}
 
 			/* Done editing */
-			ti_close(slot);
+			ti_Close(slot);
 		}
 		else
 		{
@@ -333,7 +333,7 @@ int hydra_HideFile(struct hydra_files_t *file)
 			}
 
 			/* Done editing */
-			ti_close(slot);
+			ti_Close(slot);
 		}
 		else
 		{
@@ -542,7 +542,7 @@ struct hydra_folders_t *hydra_AddFolder(char *name, struct hydra_folders_t *loca
 		return NULL;
 
 	// Check if there is a folder in that location with the same name
-	if (SearchFolder(name, location) != NULL)
+	if (hydra_SearchFolder(name, location) != NULL)
 		return NULL;
 
 	if ((hydra_folder = realloc(hydra_folder, ++HYDRA_NUM_FOLDERS * sizeof(struct hydra_folders_t))) != NULL)
