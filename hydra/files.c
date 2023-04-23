@@ -246,6 +246,89 @@ bool hydra_Detect(enum hydra_search_type_t search_type)
 	return true;
 }
 
+/* Hiding Files */
+int hydra_HideFile(struct hydra_files_t *file)
+{
+	ti_var_t slot;
+	uint8_t type;
+
+	/* Make sure we make space for error checking */
+	if (file == NULL || HYDRA_CURR_USER_ID == HYDRA_USER_NOT_SET)
+		return -1;
+
+	/* Check if it's a basic or protected program */
+	type = hydra_GetFileType(file->type);
+
+	if (type != OS_TYPE_PRGM || type != OS_TYPE_APPVAR)
+		return -2;
+
+	/* Check if the file is already hidden */
+	if (file->hidden == false)
+	{
+		/* Hide the file from TI-OS and mark it as hidden */
+
+		if ((slot = ti_OpenVar(file->name, "r+", type)))
+		{
+			/* The file was found lets start editing */
+
+			/* Go to the beginning of the program */
+			ti_Rewind(slot);
+
+			/* Check for colon */
+			if (ti_GetC(slot) == ':')
+			{
+				/* Replace colon with space */
+				ti_PutC(' ', slot);
+			}else{
+				return -4;
+			}
+
+			/* Done editing */
+			ti_close(slot);
+		}
+		else
+		{
+			/* File was not found */
+			return -3;
+		}
+
+		/* Set Hidden to true */
+		file->hidden = true;
+	}
+	else
+	{
+		/* Un-Hide the file from TI-OS and un-mark it as hidden */
+		if ((slot = ti_OpenVar(file->name, "r+", type)))
+		{
+			/* The file was found lets start editing */
+
+			/* Go to the beginning of the program */
+			ti_Rewind(slot);
+
+			/* Check for colon */
+			if (ti_GetC(slot) == ' ')
+			{
+				/* Replace colon with space */
+				ti_PutC(':', slot);
+			}else{
+				return -4;
+			}
+
+			/* Done editing */
+			ti_close(slot);
+		}
+		else
+		{
+			/* File was not found */
+			return -3;
+		}
+
+		file->hidden = false;
+	}
+
+	return file->hidden;
+}
+
 /* Pinning folders and files */
 bool hydra_PinFolder(struct hydra_folders_t *folder)
 {
@@ -280,7 +363,7 @@ bool hydra_isFilePinned(struct hydra_files_t *file)
 	if (file == NULL || HYDRA_CURR_USER_ID == HYDRA_USER_NOT_SET)
 		return false;
 
-	return file->pinned[HYDRA_CURR_USER_ID]; 
+	return file->pinned[HYDRA_CURR_USER_ID];
 }
 
 /* Deleting folders and files */

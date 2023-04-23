@@ -185,6 +185,16 @@ extern "C"
      */
     bool hydra_Detect(enum hydra_search_type_t type);
 
+    /* Hiding Files */
+    /**
+     * @brief Hide file from TI-OS
+     *
+     * @param file pointer to the file
+     * @return true file was hidden successfully
+     * @return false file was hidden due to many errors
+     */
+    int hydra_HideFile(struct hydra_files_t *file);
+
     /* Pinning folders and files */
     /**
      * @brief Sets a folder to pinned
