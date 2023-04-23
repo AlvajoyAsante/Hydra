@@ -258,7 +258,7 @@ extern "C"
      * @param location point to the folder you want to store the file in
      * @return struct hydra_files_t* points to the pointer of the file
      */
-    struct hydra_files_t *hydra_AddFile(char *name, struct hydra_folders_t *location);
+    struct hydra_files_t *hydra_CreateFile(char *name, struct hydra_folders_t *location);
 
     /**
      * @brief Adds a folder at the given folder postion
@@ -267,7 +267,7 @@ extern "C"
      * @param location pointer to the folder you want to store the folder
      * @return struct hydra_folders_t* points to the new folder just created
      */
-    struct hydra_folders_t *hydra_AddFolder(char *name, struct hydra_folders_t *location);
+    struct hydra_folders_t *hydra_CreateFolder(char *name, struct hydra_folders_t *location);
 
     /* Detecting files icons */
     /**

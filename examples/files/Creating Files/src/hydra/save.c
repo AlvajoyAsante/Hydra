@@ -128,4 +128,8 @@ void hydra_Save(void)
 	ti_SetArchiveStatus(1, slot);
 
 	ti_Close(slot);
+
+	hydra_FreeAll(); // Free all data off heap
+
+	dbg_sprintf(dbgout, "Hydra: Save Complete...\n");
 }

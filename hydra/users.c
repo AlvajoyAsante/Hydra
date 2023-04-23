@@ -27,7 +27,7 @@ struct hydra_user_t *hydra_CreateUser(char *name, char *password, enum hydra_use
 
 	if ((hydra_user = realloc(hydra_user, ++hydra_user_system.amount * sizeof(struct hydra_user_t))) != NULL)
 	{
-		curr_user = &hydra_user[hydra_user_system.amount - 1];
+		curr_user = &hydra_user[hydra_user_system.amount - 1]; 	
 
 		/* Setting the user id */
 		curr_user->user_id = hydra_user_system.amount - 1;
@@ -63,6 +63,8 @@ struct hydra_user_t *hydra_CreateUser(char *name, char *password, enum hydra_use
 		/* File system information */
 		curr_user->file_system = malloc(sizeof(struct hydra_file_system_t)); // Allocate space fore data
 		curr_user->file_system->numfiles = curr_user->file_system->numfolders = curr_user->file_system->numpins = 0;
+
+		HYDRA_CURR_USER_ID = curr_user->user_id;
 
 		return curr_user;
 	}
@@ -142,9 +144,10 @@ bool hydra_SetUserID(struct hydra_user_t *user)
 		// Set the global user id to there set user id
 		HYDRA_CURR_USER_ID = user->user_id;
 		return true;
+	}else{
+		HYDRA_CURR_USER_ID = -1;
 	}
-
-	HYDRA_CURR_USER_ID = -1;
+	
 	return false;
 }
 

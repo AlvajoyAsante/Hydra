@@ -67,8 +67,7 @@
 	hydra_Load();
 
 #define hydra_End() \
-	hydra_Save();   \
-	hydra_FreeAll();
+	hydra_Save();
 
 #include <tice.h>
 

@@ -21,10 +21,10 @@ void hydra_InitFilesSystem(void)
 	HYDRA_SETTINGS_ICON = HYDRA_SETTINGS_SORT = true;
 
 	// Create a folder called home in the root of the filesystem (This is where all the programs are held)
-	struct hydra_folders_t *home_folder = hydra_AddFolder("HOME", NULL); // ROOT
+	struct hydra_folders_t *home_folder = hydra_CreateFolder("HOME", NULL); // ROOT
 
 	// Create a folder called appvar in the home folder (This is where all the appvar are stored)
-	hydra_AddFolder("APPVARS", home_folder); // INSIDE HOME.
+	hydra_CreateFolder("APPVARS", home_folder); // INSIDE HOME.
 }
 
 struct hydra_files_t *hydra_SearchFile(char *name, struct hydra_folders_t *location)
@@ -175,7 +175,7 @@ bool hydra_Detect(enum hydra_search_type_t search_type)
 						dbg_sprintf(dbgout, "Detect: Opened File!, Name: %s\n", file_name);
 
 						/* Checks if there is space for a file */
-						if (hydra_AddFile(file_name, NULL) == NULL)
+						if (hydra_CreateFile(file_name, NULL) == NULL)
 						{
 							ti_Close(slot);
 							return false;
@@ -281,13 +281,13 @@ int hydra_HideFile(struct hydra_files_t *file)
 	{
 		/* Hide the file from TI-OS and mark it as hidden */
 
-		if (!(slot = ti_OpenVar(file->name, "r+", type)))
+		if ((slot = ti_OpenVar(file->name, "r+", type)))
 		{
 			/* The file was found lets start editing */
 
 			char temp[10] = {0};
 			ti_GetName(temp, slot);
-			temp[0] ^= 64;			
+			temp[0] ^= 64;
 
 			/* Go to the beginning of the program */
 			ti_Rewind(slot);
@@ -320,13 +320,12 @@ int hydra_HideFile(struct hydra_files_t *file)
 	else
 	{
 		/* Un-Hide the file from TI-OS and un-mark it as hidden */
-		if (!(slot = ti_OpenVar(file->name, "r+", type)))
+		if ((slot = ti_OpenVar(file->name, "r+", type)))
 		{
 			/* The file was found lets start editing */
 			char temp[10] = {0};
 			ti_GetName(temp, slot);
 			temp[0] ^= 64;
-
 
 			/* Go to the beginning of the program */
 			ti_Rewind(slot);
@@ -545,7 +544,7 @@ bool hydra_ForceDeleteFile(struct hydra_files_t *file)
 }
 
 /* Creating folders and files */
-struct hydra_folders_t *hydra_AddFolder(char *name, struct hydra_folders_t *location)
+struct hydra_folders_t *hydra_CreateFolder(char *name, struct hydra_folders_t *location)
 {
 	struct hydra_user_t *curr_user;
 
@@ -629,13 +628,16 @@ static void _ResetFilePinned(struct hydra_files_t *curr_file)
 	}
 }
 
-struct hydra_files_t *hydra_AddFile(char *name, struct hydra_folders_t *location)
+struct hydra_files_t *hydra_CreateFile(char *name, struct hydra_folders_t *location)
 {
 	struct hydra_user_t *curr_user;
 
 	// Check if there is a user currently logged in
 	if (HYDRA_CURR_USER_ID < 0)
+	{
+		dbg_sprintf(dbgout, "Hydra: Couldn't Add File USER_ID not set...\n");
 		return NULL;
+	}
 
 	// Check if there is any space to create a file.
 	if ((hydra_file = realloc(hydra_file, ++HYDRA_NUM_FILES * sizeof(struct hydra_files_t))) != NULL)
@@ -665,6 +667,10 @@ struct hydra_files_t *hydra_AddFile(char *name, struct hydra_folders_t *location
 		dbg_sprintf(dbgout, "Added File: Reallocated file, numfiles = %d\n", HYDRA_NUM_FILES);
 
 		return curr_file;
+	}
+	else
+	{
+		dbg_sprintf(dbgout, "Hydra: There isn't enough space for a file...\n");
 	}
 
 	return NULL;
@@ -758,7 +764,6 @@ void hydra_GetBasicIcons(void)
 		// Check if the program is owned by current user, don't waste computation on this file
 		if (curr_file->user_id[HYDRA_CURR_USER_ID] != HYDRA_CURR_USER_ID)
 			continue;
-		;
 
 		// Check if the file is basic or protected basic
 		if (curr_file->type == HYDRA_PBASIC_TYPE || curr_file->type == HYDRA_BASIC_TYPE)
