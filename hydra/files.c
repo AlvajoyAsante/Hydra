@@ -246,6 +246,43 @@ bool hydra_Detect(enum hydra_search_type_t search_type)
 	return true;
 }
 
+/* Pinning folders and files */
+bool hydra_PinFolder(struct hydra_folders_t *folder)
+{
+	if (folder == NULL || HYDRA_CURR_USER_ID == HYDRA_USER_NOT_SET)
+		return false;
+
+	folder->pinned = true;
+
+	return folder->pinned;
+}
+
+bool hydra_PinFile(struct hydra_files_t *file)
+{
+	if (file == NULL || HYDRA_CURR_USER_ID == HYDRA_USER_NOT_SET)
+		return false;
+
+	file->pinned[HYDRA_CURR_USER_ID] = true;
+
+	return file->pinned[HYDRA_CURR_USER_ID];
+}
+
+bool hydra_isFolderPinned(struct hydra_folders_t *folder)
+{
+	if (folder == NULL || HYDRA_CURR_USER_ID == HYDRA_USER_NOT_SET)
+		return false;
+
+	return folder->pinned;
+}
+
+bool hydra_isFilePinned(struct hydra_files_t *file)
+{
+	if (file == NULL || HYDRA_CURR_USER_ID == HYDRA_USER_NOT_SET)
+		return false;
+
+	return file->pinned[HYDRA_CURR_USER_ID]; 
+}
+
 /* Deleting folders and files */
 bool hydra_DeleteFolder(struct hydra_folders_t *folder)
 {

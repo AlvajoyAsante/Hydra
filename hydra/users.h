@@ -55,6 +55,7 @@
 #define HYDRA_SETTINGS_CAN_PIN	hydra_user_system.users_can_pin
 #define HYDRA_SETTINGS_CAN_EDIT	hydra_user_system.users_can_edit
 #define HYDRA_ADMIN_USER hydra_user[0]
+#define HYDRA_USER_NOT_SET -1
 
 #include <tice.h>
 #include <graphx.h>

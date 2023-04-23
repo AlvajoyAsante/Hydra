@@ -68,15 +68,15 @@ extern "C"
 #endif /* __cplusplus */
     /**
      * @brief Enum of hydra search type
-     * 
+     *
      */
-    enum hydra_search_type_t {
-        HYDRA_HARD_SEARCH,  // RESCAN AND CHECK FOR DELETED FILES 
-        HYDRA_SOFT_SEARCH,  // SCAN WITHOUT RESCANNING
+    enum hydra_search_type_t
+    {
+        HYDRA_HARD_SEARCH, // RESCAN AND CHECK FOR DELETED FILES
+        HYDRA_SOFT_SEARCH, // SCAN WITHOUT RESCANNING
         HYDRA_RESCAN_SEARCH
     };
-    
-    
+
     /**
      * @brief Enum of hydra file types
      *
@@ -150,14 +150,13 @@ extern "C"
     };
     extern struct hydra_file_system_t hydra_file_system;
 
+    /* Initialing file system */
     /**
      * @brief Init the file system for use.
      */
     void hydra_InitFilesSystem(void);
 
-
     /* Searching for file and folder */
-    
     /**
      * @brief Searches for a file and returns it's pointer
      *
@@ -176,38 +175,54 @@ extern "C"
      */
     struct hydra_folders_t *hydra_SearchFolder(char *name, struct hydra_folders_t *location);
 
-
     /* Detecting Files in TI-OS */
     /**
      * @brief Detect all files on TI-OS and uploads it into file system/
-     * 
+     *
      * @param type search type
      * @return true all files where detected and uploaded
      * @return false files were not detected and uploaded
      */
     bool hydra_Detect(enum hydra_search_type_t type);
-    
-    
+
+    /* Pinning folders and files */
     /**
-     * @brief Check through file system and removes any files that don't belong.
+     * @brief Sets a folder to pinned
      *
+     * @param folder pointer to the folder
+     * @return true
+     * @return false
      */
-    // void hydra_CheckFileSystem(void);
+    bool hydra_PinFolder(struct hydra_folders_t *folder);
 
     /**
-     * @brief Rescan the file system to check for new files.
+     * @brief set a file to pinned
      *
+     * @param file pointer to the file
+     * @return true file was pinned
+     * @return false file was not unpinned or not found
      */
-    // void hydra_RescanFileSystem(void);
+    bool hydra_PinFile(struct hydra_files_t *file);
 
     /**
-     * @brief Detects all files on calculator (programs and app-vars).
+     * @brief Checks if a folder was pinned
+     *
+     * @param folder pointer to folder
+     * @return true folder is pinned and exist
+     * @return false folder is not pinned or doesn't exist
      */
-    // void hydra_DetectAllFiles(void);
+    bool hydra_isFolderPinned(struct hydra_folders_t *folder);
 
+    /**
+     * @brief Checks if a file was pinned
+     *
+     * @param file pointer to file
+     * @return true file is pinned and exist
+     * @return false file is not pinned or doesn't exist
+     */
+    bool hydra_isFilePinned(struct hydra_files_t *file);
 
     /* Deleting folders and files */
-
     /**
      * @brief Deletes a folder
      *
