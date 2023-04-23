@@ -1,8 +1,11 @@
+# Personal Builders
+cpy_hydra.bat
+
 # VS Code files
 *~
 .vs/
 .vscode/
-cpy_hydra.bat/
+
 
 # Build results
 [Dd]ebug/
