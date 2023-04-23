@@ -2,6 +2,7 @@
 *~
 .vs/
 .vscode/
+cpy_hydra.bat/
 
 # Build results
 [Dd]ebug/
