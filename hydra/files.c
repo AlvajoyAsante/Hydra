@@ -138,7 +138,7 @@ bool hydra_Detect(enum hydra_search_type_t search_type)
 			for (int i = 0; i < hydra_file_system.numfiles; i++)
 			{
 
-				if (!(slot = ti_OpenVar(hydra_file[i].name, "r", type)))
+				if (!(slot = ti_OpenVar(hydra_file[i].name, "r", hydra_GetFileType(hydra_file[i].type))))
 				{
 					hydra_DeleteFile(&hydra_file[i]);
 					ti_Close(slot);
@@ -216,6 +216,20 @@ bool hydra_Detect(enum hydra_search_type_t search_type)
 						curr_file->icon = NULL;
 						curr_file->description = NULL;
 
+						/* Check if the file is hidden */
+						if (type == OS_TYPE_PRGM || type == OS_TYPE_PROT_PRGM)
+						{
+							ti_Rewind(slot);
+							if (ti_GetC(slot) == ' ')
+							{
+								curr_file->hidden = true;
+							}
+							else
+							{
+								curr_file->hidden = false;
+							}
+						}
+
 						dbg_sprintf(dbgout, "Detect: File Done!.\n");
 
 						ti_Close(slot);
@@ -279,7 +293,9 @@ int hydra_HideFile(struct hydra_files_t *file)
 			{
 				/* Replace colon with space */
 				ti_PutC(' ', slot);
-			}else{
+			}
+			else
+			{
 				return -4;
 			}
 
@@ -310,7 +326,9 @@ int hydra_HideFile(struct hydra_files_t *file)
 			{
 				/* Replace colon with space */
 				ti_PutC(':', slot);
-			}else{
+			}
+			else
+			{
 				return -4;
 			}
 
