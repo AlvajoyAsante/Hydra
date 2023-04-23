@@ -27,7 +27,7 @@ void hydra_InitFilesSystem(void)
 	hydra_AddFolder("APPVARS", home_folder); // INSIDE HOME.
 }
 
-struct hydra_files_t *SearchFile(char *name, struct hydra_folders_t *location)
+struct hydra_files_t *hydra_SearchFile(char *name, struct hydra_folders_t *location)
 {
 	if (HYDRA_CURR_USER_ID < 0)
 		return NULL;
@@ -46,7 +46,7 @@ struct hydra_files_t *SearchFile(char *name, struct hydra_folders_t *location)
 	return NULL;
 }
 
-struct hydra_folders_t *SearchFolder(char *name, struct hydra_folders_t *location)
+struct hydra_folders_t *hydra_SearchFolder(char *name, struct hydra_folders_t *location)
 {
 	// if there isn't an user logged return.
 	if (HYDRA_CURR_USER_ID < 0)
@@ -138,7 +138,7 @@ bool hydra_Detect(enum hydra_search_type_t search_type)
 			for (int i = 0; i < hydra_file_system.numfiles; i++)
 			{
 
-				if (!(slot = ti_OpenVar(hydra_file[i].name, "r", type)))
+				if (!(slot = ti_OpenVar(hydra_file[i].name, "r", hydra_GetFileType(hydra_file[i].type))))
 				{
 					hydra_DeleteFile(&hydra_file[i]);
 					ti_Close(slot);
@@ -216,6 +216,20 @@ bool hydra_Detect(enum hydra_search_type_t search_type)
 						curr_file->icon = NULL;
 						curr_file->description = NULL;
 
+						/* Check if the file is hidden */
+						if (type == OS_TYPE_PRGM || type == OS_TYPE_PROT_PRGM)
+						{
+							ti_Rewind(slot);
+							if (ti_GetC(slot) == ' ')
+							{
+								curr_file->hidden = true;
+							}
+							else
+							{
+								curr_file->hidden = false;
+							}
+						}
+
 						dbg_sprintf(dbgout, "Detect: File Done!.\n");
 
 						ti_Close(slot);
@@ -244,6 +258,142 @@ bool hydra_Detect(enum hydra_search_type_t search_type)
 	}
 
 	return true;
+}
+
+/* Hiding Files */
+int hydra_HideFile(struct hydra_files_t *file)
+{
+	ti_var_t slot;
+	uint8_t type;
+
+	/* Make sure we make space for error checking */
+	if (file == NULL || HYDRA_CURR_USER_ID == HYDRA_USER_NOT_SET)
+		return -1;
+
+	/* Check if it's a basic or protected program */
+	type = hydra_GetFileType(file->type);
+
+	if (type != OS_TYPE_PRGM || type != OS_TYPE_APPVAR)
+		return -2;
+
+	/* Check if the file is already hidden */
+	if (file->hidden == false)
+	{
+		/* Hide the file from TI-OS and mark it as hidden */
+
+		if (!(slot = ti_OpenVar(file->name, "r+", type)))
+		{
+			/* The file was found lets start editing */
+
+			char temp[10] = {0};
+			ti_GetName(temp, slot);
+			temp[0] ^= 64;			
+
+			/* Go to the beginning of the program */
+			ti_Rewind(slot);
+
+			/* Check for colon */
+			if (ti_GetC(slot) == ':')
+			{
+				/* Replace colon with space */
+				ti_PutC(' ', slot);
+			}
+			else
+			{
+				return -4;
+			}
+
+			/* Done editing */
+			ti_Close(slot);
+
+			ti_Rename(file->name, temp);
+		}
+		else
+		{
+			/* File was not found */
+			return -3;
+		}
+
+		/* Set Hidden to true */
+		file->hidden = true;
+	}
+	else
+	{
+		/* Un-Hide the file from TI-OS and un-mark it as hidden */
+		if (!(slot = ti_OpenVar(file->name, "r+", type)))
+		{
+			/* The file was found lets start editing */
+			char temp[10] = {0};
+			ti_GetName(temp, slot);
+			temp[0] ^= 64;
+
+
+			/* Go to the beginning of the program */
+			ti_Rewind(slot);
+
+			/* Check for space */
+			if (ti_GetC(slot) == ' ')
+			{
+				/* Replace space with colon */
+				ti_PutC(':', slot);
+			}
+			else
+			{
+				return -4;
+			}
+
+			/* Done editing */
+			ti_Close(slot);
+
+			ti_Rename(file->name, temp);
+		}
+		else
+		{
+			/* File was not found */
+			return -3;
+		}
+
+		file->hidden = false;
+	}
+
+	return file->hidden;
+}
+
+/* Pinning folders and files */
+bool hydra_PinFolder(struct hydra_folders_t *folder)
+{
+	if (folder == NULL || HYDRA_CURR_USER_ID == HYDRA_USER_NOT_SET)
+		return false;
+
+	folder->pinned = true;
+
+	return folder->pinned;
+}
+
+bool hydra_PinFile(struct hydra_files_t *file)
+{
+	if (file == NULL || HYDRA_CURR_USER_ID == HYDRA_USER_NOT_SET)
+		return false;
+
+	file->pinned[HYDRA_CURR_USER_ID] = true;
+
+	return file->pinned[HYDRA_CURR_USER_ID];
+}
+
+bool hydra_isFolderPinned(struct hydra_folders_t *folder)
+{
+	if (folder == NULL || HYDRA_CURR_USER_ID == HYDRA_USER_NOT_SET)
+		return false;
+
+	return folder->pinned;
+}
+
+bool hydra_isFilePinned(struct hydra_files_t *file)
+{
+	if (file == NULL || HYDRA_CURR_USER_ID == HYDRA_USER_NOT_SET)
+		return false;
+
+	return file->pinned[HYDRA_CURR_USER_ID];
 }
 
 /* Deleting folders and files */
@@ -404,7 +554,7 @@ struct hydra_folders_t *hydra_AddFolder(char *name, struct hydra_folders_t *loca
 		return NULL;
 
 	// Check if there is a folder in that location with the same name
-	if (SearchFolder(name, location) != NULL)
+	if (hydra_SearchFolder(name, location) != NULL)
 		return NULL;
 
 	if ((hydra_folder = realloc(hydra_folder, ++HYDRA_NUM_FOLDERS * sizeof(struct hydra_folders_t))) != NULL)
