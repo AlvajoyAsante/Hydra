@@ -1,8 +1,8 @@
 /*
  *--------------------------------------
  * Program Name: Demo
- * Author: Alvajoy Asante
- * Description: Hydra Demo
+ * Author: Alvajoy 'Alvajoy123' Asante
+ * Description: Hydra Build Demo
  *--------------------------------------
 */
 
