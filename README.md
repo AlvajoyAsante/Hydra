@@ -4,7 +4,7 @@
 
 > Unlock Endless Possibilities with Hydra.
 
-Hydra is a powerful virtual filesystem framework for the CE C Toolchain. It provides a wide range of features for managing programs on the calculator and for the first time ever users management.
+Hydra is a powerful virtual filesystem library for the CE C Toolchain. It provides a wide range of features for managing programs on the calculator and for the first time ever users management.
 
 ## Getting Started
 
