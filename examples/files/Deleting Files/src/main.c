@@ -13,6 +13,9 @@
 
 int main(void)
 {
+    /* Clear the homescreen */
+    os_ClrHome();
+
     /*
      * Always begin usage of file system with this code,
      * What this code does apply all the files in TI-OS into Hydra
@@ -22,7 +25,7 @@ int main(void)
 
     // Put all you code for messing with the file system in here
 
-    /* This piece of code searches for the file name with DEMO and returns it's poiner to given position  */
+    /* This piece of code searches for the file name with DEMO and returns it's pointer to given position  */
     struct hydra_files_t * DEMO_FILE = hydra_SearchFile("DEMO", HYDRA_HOME_FOLDER);
     
     /* We want to check if the file named demo is in the hydra file system ... if the variable is NULL stop */

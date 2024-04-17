@@ -135,7 +135,7 @@ extern "C"
     extern struct hydra_folders_t *hydra_folder;
 
     /**
-     * @brief File system information and settings
+     * @brief File System Information container 
      */
     struct hydra_file_system_t
     {

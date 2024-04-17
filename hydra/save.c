@@ -129,7 +129,7 @@ void hydra_Save(void)
 
 	ti_Close(slot);
 
-	hydra_FreeAll(); // Free all data off heap
+	hydra_FreeAll(); // Free all data off stack
 
 	dbg_sprintf(dbgout, "Hydra: Save Complete...\n");
 }
