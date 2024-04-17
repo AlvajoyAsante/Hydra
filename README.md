@@ -1,10 +1,10 @@
 # Hydra ![](https://img.shields.io/github/release/Overload02/Hydra) ![](https://img.shields.io/github/issues/Overload02/Hydra)
 ![](https://i.imgur.com/Px46HVE.png)
 
-> *Hydra is a filesystem API for the [CE C Toolchain](https://github.com/CE-Programming/toolchain). with its many features; Hydra allows you to make users and manage files that belongs to different users.*
+> *Hydra is a filesystem library for the [CE C Toolchain](https://github.com/CE-Programming/toolchain). With its many features; Hydra allows you to make users and manage files that belong to different users.*
 
 ## Getting Started
-Visit the Hydra documentation for information on setting up Hydra with the [CE C Toolchain](https://github.com/CE-Programming/toolchain) and information about its functions.
+You can visit the Hydra documentation for information on setting up Hydra with the [CE C Toolchain](https://github.com/CE-Programming/toolchain) and its functions.
 
 ## Features
 
