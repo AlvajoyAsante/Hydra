@@ -4,7 +4,7 @@
  * @brief Linker file for sections for hydra
  * @version 0.1
  *
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023 - 2024
  *
  * 888    888   Y88b   d88P   8888888b.     8888888b.          d8888
  * 888    888    Y88b d88P    888  "Y88b    888   Y88b        d88888
